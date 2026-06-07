@@ -20,7 +20,8 @@
 - [企画書](docs/product-plan.md)
 - [開発ロードマップ](docs/roadmap.md)
 - [開発・学習ガイド](docs/development-guide.md)
+- [開発環境セットアップ](docs/setup.md)
 
 ## 現在のフェーズ
 
-フェーズ0（企画・技術方針の確定）です。次はFlutter開発環境を構築し、iOSとAndroidで空のアプリを起動します。
+フェーズ2（技術プロトタイプ）を進行中です。時計表示、反射アニメーション、画面回転への追従をiOS / Androidで確認済みです。
