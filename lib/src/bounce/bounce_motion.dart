@@ -12,22 +12,29 @@ BounceState advanceBounce({
   required double elapsedSeconds,
   required Size areaSize,
   required Size objectSize,
+  double boundaryOutset = 0,
 }) {
-  final maxX = (areaSize.width - objectSize.width).clamp(0.0, double.infinity);
-  final maxY = (areaSize.height - objectSize.height).clamp(
+  final min = -boundaryOutset;
+  final maxX = (areaSize.width - objectSize.width + boundaryOutset).clamp(
+    0.0,
+    double.infinity,
+  );
+  final maxY = (areaSize.height - objectSize.height + boundaryOutset).clamp(
     0.0,
     double.infinity,
   );
   final x = _advanceAxis(
-    position: state.position.dx.clamp(0.0, maxX),
+    position: state.position.dx.clamp(min, maxX),
     velocity: state.velocity.dx,
     elapsedSeconds: elapsedSeconds,
+    minimum: min,
     maximum: maxX,
   );
   final y = _advanceAxis(
-    position: state.position.dy.clamp(0.0, maxY),
+    position: state.position.dy.clamp(min, maxY),
     velocity: state.velocity.dy,
     elapsedSeconds: elapsedSeconds,
+    minimum: min,
     maximum: maxY,
   );
 
@@ -41,18 +48,19 @@ _AxisState _advanceAxis({
   required double position,
   required double velocity,
   required double elapsedSeconds,
+  required double minimum,
   required double maximum,
 }) {
-  if (maximum == 0) {
+  if (minimum == maximum) {
     return const _AxisState(position: 0, velocity: 0);
   }
 
   var nextPosition = position + velocity * elapsedSeconds;
   var nextVelocity = velocity;
 
-  while (nextPosition < 0 || nextPosition > maximum) {
-    if (nextPosition < 0) {
-      nextPosition = -nextPosition;
+  while (nextPosition < minimum || nextPosition > maximum) {
+    if (nextPosition < minimum) {
+      nextPosition = minimum + (minimum - nextPosition);
       nextVelocity = nextVelocity.abs();
     } else {
       nextPosition = maximum - (nextPosition - maximum);

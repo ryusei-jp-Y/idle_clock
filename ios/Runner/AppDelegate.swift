@@ -7,10 +7,18 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    application.isIdleTimerDisabled = true
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+  }
+
+  override func application(
+    _ application: UIApplication,
+    supportedInterfaceOrientationsFor window: UIWindow?
+  ) -> UIInterfaceOrientationMask {
+    return .landscape
   }
 }

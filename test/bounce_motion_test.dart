@@ -37,6 +37,22 @@ void main() {
     expect(result.velocity, const Offset(-100, -50));
   });
 
+  test('allows a small boundary outset before reflecting', () {
+    final result = advanceBounce(
+      state: const BounceState(
+        position: Offset(202, 30),
+        velocity: Offset(100, 0),
+      ),
+      elapsedSeconds: 0.08,
+      areaSize: areaSize,
+      objectSize: objectSize,
+      boundaryOutset: 6,
+    );
+
+    expect(result.position, const Offset(202, 30));
+    expect(result.velocity, const Offset(-100, 0));
+  });
+
   test('clamps the visual inside a resized area', () {
     final result = advanceBounce(
       state: const BounceState(

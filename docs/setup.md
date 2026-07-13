@@ -1,20 +1,17 @@
 # 開発環境セットアップ
 
-2026年6月7日にApple Silicon Macで確認した手順です。
+2026年6月21日に、Apple App Storeのみへリリースする方針に合わせて
+iOS専用の開発環境へ単純化した手順です。
 
 ## 使用するツール
 
 - Flutter 3.44.1 / Dart 3.12.1
-- Android SDK 36 / Build Tools 36.0.0
-- Android Emulator 36.6.11
-- Android Studio
-- Xcode 26.3
-- iOS 26.3.1 Simulator
+- Xcode
+- iOS Simulator
 - CocoaPods 1.16.2
 - Visual Studio Code + Flutter / Dart拡張
 
-FlutterやAndroid SDKの安定版は更新されるため、別PCでは導入後に
-`flutter --version`と`flutter doctor -v`で実際のバージョンを記録する。
+Android SDK、Android Studio、Android Emulatorはこのプロジェクトでは使用しない。
 
 ## 1. Homebrew
 
@@ -28,48 +25,18 @@ XcodeはHomebrewではなく、Mac App Storeからインストールする。
 最新Xcodeが現在のmacOSに対応していない場合、App Storeに表示される
 「互換性のある旧バージョン」をインストールする。
 
-## 2. Android SDK
-
-Android Studio付属のJDKと、標準のAndroid SDK保存先を使用する。
+Flutterの診断対象もiOSに絞る。
 
 ```sh
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-
-mkdir -p "$ANDROID_HOME"
-yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses
-sdkmanager --sdk_root="$ANDROID_HOME" \
-  "cmdline-tools;latest" \
-  "platform-tools" \
-  "platforms;android-36" \
-  "build-tools;36.0.0" \
-  "emulator" \
-  "system-images;android-36;google_apis_playstore;arm64-v8a"
-
-flutter config --android-sdk "$ANDROID_HOME"
-flutter config --jdk-dir "$JAVA_HOME"
+flutter config \
+  --no-enable-android \
+  --no-enable-web \
+  --no-enable-macos-desktop \
+  --no-enable-linux-desktop \
+  --no-enable-windows-desktop
 ```
 
-Intel Macではシステムイメージの`arm64-v8a`を`x86_64`へ変更する。
-
-`~/.zshrc`へ次を追加し、新しいターミナルを開く。
-
-```sh
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
-```
-
-Android仮想端末を作成する。
-
-```sh
-avdmanager create avd \
-  --name idle_clock_api_36 \
-  --package "system-images;android-36;google_apis_playstore;arm64-v8a" \
-  --device pixel_7
-```
-
-## 3. Xcode
+## 2. Xcode
 
 Mac App StoreからXcode本体をインストールした後に実行する。
 
@@ -83,10 +50,10 @@ xcodebuild -downloadPlatform iOS
 表示されないが、そのまま入力してReturnを押す。
 
 SimulatorランタイムはXcode本体とは別に数GBのダウンロードが必要になる。
-このPCではiOS 26.3.1が8.39GBだった。また、最初のSimulator起動時には
-共有ライブラリキャッシュが生成されるため、Appleロゴの画面で数分待つ場合がある。
+最初のSimulator起動時には共有ライブラリキャッシュが生成されるため、
+Appleロゴの画面で数分待つ場合がある。
 
-## 4. VS Code
+## 3. VS Code
 
 VS Codeでこのリポジトリを開くと、`.vscode/extensions.json`によりFlutterと
 Dart拡張が推奨される。CLIから導入する場合は次を実行する。
@@ -95,7 +62,7 @@ Dart拡張が推奨される。CLIから導入する場合は次を実行する�
 code --install-extension Dart-Code.flutter
 ```
 
-## 5. 動作確認
+## 4. 動作確認
 
 ```sh
 flutter doctor -v
@@ -104,27 +71,56 @@ flutter analyze
 flutter test
 ```
 
-Androidで起動する。
-
-```sh
-flutter emulators --launch idle_clock_api_36
-flutter run
-```
-
 iOSで起動する。
 
 ```sh
 open -a Simulator
-flutter run
+flutter run -d ios
 ```
 
-## このPCの現在の状態
+## 5. 修正後の反映・プレビュー
 
-- Android: 初期アプリのビルド、インストール、エミュレーター起動まで確認済み
-- iOS: 初期アプリのビルド、インストール、Simulator起動まで確認済み
+`flutter run -d ios`で起動している最中にDart / Flutter側だけを変更した場合は、
+ターミナルで`r`を押してHot Reload、反映が不十分な場合は`R`でHot Restartする。
+
+一度ビルド済みの`Runner.app`をSimulatorへ入れて確認している場合、コード修正後は
+必ず再ビルドしてから入れ直す。古い`Runner.app`を再インストールすると、最新の
+UI変更が反映されない。
+
+```sh
+flutter build ios --simulator
+open -a Simulator
+xcrun simctl install booted build/ios/iphonesimulator/Runner.app
+xcrun simctl launch booted com.example.idleClock
+```
+
+起動中のSimulatorがない場合は、先に利用可能な端末を起動する。
+
+```sh
+xcrun simctl list devices available
+xcrun simctl boot <device-udid>
+xcrun simctl bootstatus <device-udid> -b
+open -a Simulator
+```
+
+作業後にマシン負荷を下げる場合は、Simulator端末とSimulatorアプリを終了する。
+
+```sh
+xcrun simctl shutdown all
+osascript -e 'tell application "Simulator" to quit'
+```
+
+App Store配布前は、XcodeでBundle ID、署名チーム、表示名、アイコン、
+プライバシー情報を確定する。
+
+## このPCの現在の方針
+
+- Android開発環境は削除済み
+- 配布対象はApple App Storeのみ
+- Xcode 26.5 / iOS 26.5 Simulatorで起動確認済み
 - `flutter doctor`: 問題なし
-- `flutter analyze` / `flutter test`: 成功
-- 仮Application ID: `com.example.idle_clock`
+- `dart format --output=none --set-exit-if-changed lib test`: 成功
+- `flutter analyze`: 成功
+- `flutter test`: 成功
 - 仮Bundle ID: `com.example.idleClock`
-
-正式なIDはストア配布準備までに決定し、AndroidとiOSの両方で変更する。
+- 正式なBundle IDはApp Store配布準備までに決定する

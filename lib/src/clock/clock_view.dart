@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
 import 'clock_formatter.dart';
 
 typedef CurrentTime = DateTime Function();
@@ -68,29 +69,40 @@ class _ClockViewState extends State<ClockView> {
 
   @override
   Widget build(BuildContext context) {
+    final formattedTime = formatClockTime(
+      _time,
+      use24Hour: widget.use24Hour,
+      showSeconds: widget.showSeconds,
+    );
+    final viewportSize = MediaQuery.sizeOf(context);
+    final fontSize = (viewportSize.shortestSide * 0.3).clamp(72.0, 148.0);
+    final visualTheme = clockVisualThemeOf(context);
+
     return Semantics(
       label: '現在時刻',
-      value: formatClockTime(
-        _time,
-        use24Hour: widget.use24Hour,
-        showSeconds: widget.showSeconds,
-      ),
-      child: Text(
-        formatClockTime(
-          _time,
-          use24Hour: widget.use24Hour,
-          showSeconds: widget.showSeconds,
-        ),
+      value: formattedTime,
+      child: Row(
         key: const ValueKey('clock-time'),
-        maxLines: 1,
-        style: const TextStyle(
-          color: Color(0xFFF4F2FF),
-          fontSize: 56,
-          fontWeight: FontWeight.w300,
-          letterSpacing: 4,
-          fontFeatures: [FontFeature.tabularFigures()],
-        ),
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final character in formattedTime.split(''))
+            Text(
+              character,
+              style: _clockTextStyle.copyWith(
+                color: visualTheme.clockColor,
+                fontSize: fontSize,
+              ),
+            ),
+        ],
       ),
     );
   }
 }
+
+const _clockTextStyle = TextStyle(
+  color: Color(0xFFF4F2FF),
+  fontFamily: 'BitcountGridDouble',
+  fontWeight: FontWeight.w400,
+  letterSpacing: 2,
+  fontFeatures: [FontFeature.tabularFigures()],
+);

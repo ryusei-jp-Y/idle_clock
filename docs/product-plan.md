@@ -7,7 +7,8 @@
 | プロジェクト名 | Idle Clock（開発用仮称） |
 | バージョン | 0.1 |
 | 作成日 | 2026-06-07 |
-| 対象プラットフォーム | MVP: iOS / Android、MVP後: macOS |
+| 対象プラットフォーム | MVP: iOS |
+| 配布先 | Apple App Store |
 
 ## 1. アプリ概要・目的
 
@@ -47,7 +48,7 @@ MVPでは、次のユーザーを主対象と仮定する。プロトタイプ�
 - 課金、広告
 - ソーシャル機能
 - 外部APIやサーバー
-- Windows / Linux対応
+- Android / macOS / Windows / Linux対応
 - 大量の物理パーティクル
 
 ## 3. 画面構成
@@ -73,8 +74,8 @@ MVPでは、次のユーザーを主対象と仮定する。プロトタイプ�
 
 ### 対象OS
 
-- MVP: iOS / Android
-- 次期対応: macOS
+- MVP: iOS
+- App Store公開を前提に、iPhone実機とiOS Simulatorで確認する
 
 ## 5. データモデル概要
 
