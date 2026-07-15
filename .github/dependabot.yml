@@ -1,0 +1,27 @@
+# Dependabot: 依存を週次でまとめて更新 PR にする。
+# - pub            : pubspec.yaml / pubspec.lock の Dart/Flutter 依存
+# - github-actions : ワークフローで使う action のバージョン
+version: 2
+updates:
+  - package-ecosystem: pub
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(deps)"
