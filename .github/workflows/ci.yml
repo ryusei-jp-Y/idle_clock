@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # pubspec.yaml の Dart SDK 制約 (^3.12.1) を満たす stable Flutter を使う。
       # 万一 stable が制約を満たさない場合は flutter-version を明示ピンする。
