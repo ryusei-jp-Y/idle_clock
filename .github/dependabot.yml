@@ -1,6 +1,9 @@
 # Dependabot: 依存を週次でまとめて更新 PR にする。
 # - pub            : pubspec.yaml / pubspec.lock の Dart/Flutter 依存
 # - github-actions : ワークフローで使う action のバージョン
+#
+# 方針: メジャー更新 (semver-major) は Dependabot からは提案しない。
+#       patch/minor + セキュリティ更新のみ自動化し、メジャーは必要時に手動で上げる。
 version: 2
 updates:
   - package-ecosystem: pub
@@ -14,6 +17,10 @@ updates:
         update-types:
           - minor
           - patch
+    # メジャーは提案しない（手動対応）。現行メジャー系列内の patch/minor は従来どおり自動化される。
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "chore(deps)"
 
@@ -23,5 +30,8 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "ci(deps)"
