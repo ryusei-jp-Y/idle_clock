@@ -32,6 +32,12 @@ Privacy Policy URL:
 https://idle-clock.yamanari.dev/privacy/
 ```
 
+## Bundle ID
+
+```text
+dev.yamanari.idleclock
+```
+
 ## 説明文
 
 横向きに置いて眺める、ミニマルな時計アプリです。
